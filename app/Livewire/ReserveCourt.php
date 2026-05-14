@@ -10,61 +10,95 @@ use Illuminate\Support\Facades\Auth;
 
 class ReserveCourt extends Component
 {
-    // Variables enlazadas al formulario
-    public $court_id = '';
-    public $reservation_date = '';
-    public $start_time = '';
+    public $weekOffset = 0;
+    public $court_id = 1; // Controla lo que muestra la tabla
+    
+    // Datos del formulario de reserva
+    public $selected_court_id = 1; // El usuario elige aquí la pista final
+    public $reservation_date;
+    public $start_time;
 
-    public function render()
+    public function getSlotsProperty()
     {
-        return view('livewire.reserve-court', [
-            'courts' => Court::where('is_active', true)->get()
-        ]);
+        $slots = [];
+        $current = Carbon::createFromTime(8, 30);
+        $end = Carbon::createFromTime(22, 0);
+        
+        while ($current < $end) {
+            $slots[] = $current->format('H:i');
+            $current->addMinutes(30);
+        }
+        return $slots;
+    }
+
+    public function changeWeek($direction)
+    {
+        $newOffset = $this->weekOffset + $direction;
+        if ($newOffset >= 0 && $newOffset <= 4) $this->weekOffset = $newOffset;
     }
 
     public function save()
     {
-        // 1. Validación básica de los campos
         $this->validate([
-            'court_id' => 'required|exists:courts,id',
+            'selected_court_id' => 'required|exists:courts,id',
             'reservation_date' => 'required|date|after_or_equal:today',
-            'start_time' => 'required|date_format:H:i',
-        ], [
-            'reservation_date.after_or_equal' => 'No puedes reservar en el pasado.',
-            'court_id.required' => 'Debes seleccionar una pista.',
+            'start_time' => 'required',
         ]);
 
-        // 2. Construcción de fechas con Carbon
-        $startDateTime = Carbon::parse($this->reservation_date . ' ' . $this->start_time);
-        $endDateTime = $startDateTime->copy()->addMinutes(90); // Partidos de 90 min estrictos
+        $start = Carbon::parse($this->reservation_date . ' ' . $this->start_time);
+        $end = $start->copy()->addMinutes(90);
 
-        // 3. Prevención de Overbooking (Solapamiento)
-        $conflict = Reservation::where('court_id', $this->court_id)
-            ->where('status', 'confirmed')
-            ->where(function ($query) use ($startDateTime, $endDateTime) {
-                // Lógica de solapamiento
-                $query->where('start_time', '<', $endDateTime)
-                      ->where('end_time', '>', $startDateTime);
-            })
-            ->exists();
-
-        if ($conflict) {
-            // Mandamos el error personalizado a la vista
-            $this->addError('overlap', '¡Esa pista ya está ocupada en ese tramo! El bloque de 90 min choca con otra reserva. Elige otra hora.');
+        if ($end->format('H:i') > '22:00' || $start->format('H:i') < '08:30') {
+            $this->addError('start_time', 'El horario debe estar entre las 08:30 y las 22:00.');
             return;
         }
 
-        // 4. Guardar la reserva en Base de Datos
+        $conflict = Reservation::where('court_id', $this->selected_court_id)
+            ->where('status', 'confirmed')
+            ->where('start_time', '<', $end)
+            ->where('end_time', '>', $start)
+            ->exists();
+
+        if ($conflict) {
+            $this->addError('overlap', 'La pista elegida ya tiene una reserva en ese horario.');
+            return;
+        }
+
         Reservation::create([
             'user_id' => Auth::id(),
-            'court_id' => $this->court_id,
-            'start_time' => $startDateTime,
-            'end_time' => $endDateTime,
-            'status' => 'confirmed',
+            'court_id' => $this->selected_court_id,
+            'start_time' => $start,
+            'end_time' => $end,
+            'status' => 'confirmed'
         ]);
 
-        // 5. Mensaje de éxito y limpieza del formulario
-        session()->flash('message', '¡Reserva confirmada con éxito! Has reservado 90 minutos.');
-        $this->reset(['court_id', 'reservation_date', 'start_time']);
+        session()->flash('message', '¡Reserva confirmada con éxito!');
+        $this->reset(['reservation_date', 'start_time']);
+    }
+
+    public function render()
+    {
+        Carbon::setLocale('es');
+        
+        // Calculamos el lunes de la semana que toque según el offset
+        $startOfWeek = Carbon::now()->startOfWeek()->addWeeks($this->weekOffset);
+        $endOfWeek = $startOfWeek->copy()->endOfWeek();
+        
+        $days = [];
+        for ($i = 0; $i < 7; $i++) { 
+            $days[] = $startOfWeek->copy()->addDays($i); 
+        }
+
+        $reservations = Reservation::where('court_id', $this->court_id)
+            ->where('status', 'confirmed')
+            ->whereBetween('start_time', [$startOfWeek->startOfDay(), $endOfWeek->endOfDay()])
+            ->get();
+
+        return view('livewire.reserve-court', [
+            'courts' => Court::all(),
+            'days' => $days,
+            'weekRange' => $startOfWeek->format('d M') . ' — ' . $endOfWeek->format('d M'),
+            'existingReservations' => $reservations
+        ]);
     }
 }
