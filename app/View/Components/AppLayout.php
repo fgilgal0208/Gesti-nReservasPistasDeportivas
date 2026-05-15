@@ -4,6 +4,8 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class AppLayout extends Component
 {
@@ -13,5 +15,18 @@ class AppLayout extends Component
     public function render(): View
     {
         return view('layouts.app');
+    }
+
+    /**
+     * Cierra la sesión del usuario
+     */
+    public function logout()
+    {
+        Auth::guard('web')->logout();
+
+        Session::invalidate();
+        Session::regenerateToken();
+
+        return redirect('/');
     }
 }

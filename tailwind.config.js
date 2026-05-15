@@ -14,6 +14,18 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                // TUS NUEVOS COLORES PERSONALIZADOS
+                'wpt-dark': '#101010',      // Negro Pizarra (Fondo)
+                'wpt-darker': '#0a0a0a',   // Negro más oscuro
+                'wpt-blue': '#0055FF',     // Azul Eléctrico (Interactivos)
+                'wpt-blue-hover': '#0044CC',
+                'wpt-red': '#FF0033',      // Rojo Neón (Ocupado/Cancelar)
+                'wpt-red-hover': '#CC0022',
+                'wpt-silver': '#C0C0C0',   // Gris Plata (Reglas/Pasado)
+                'wpt-slate': '#1A1A1A',    // Gris muy oscuro (Tarjetas)
+                'wpt-slate-border': '#2A2A2A',
+            },
         },
     },
 
