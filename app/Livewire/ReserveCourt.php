@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Livewire;
-
+use App\Mail\ReservationConfirmed;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use App\Models\Court;
 use App\Models\Reservation;
@@ -74,6 +75,14 @@ class ReserveCourt extends Component
 
         session()->flash('message', '¡Reserva confirmada con éxito!');
         $this->reset(['reservation_date', 'start_time']);
+
+        $reservation = Reservation::create([
+        'user_id' => Auth::id(),
+        'court_id' => $this->selected_court_id,
+        'start_time' => $start,
+        'end_time' => $end,
+        'status' => 'confirmed'
+        ]);
     }
 
     public function render()
