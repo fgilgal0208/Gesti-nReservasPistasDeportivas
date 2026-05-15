@@ -18,10 +18,16 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'is_admin' => true,
         ]);
+        User::factory()->create([
+            'name' => 'Prueba Fran',
+            'email' => 'frangilarte07@gmail.com',
+            'password' => Hash::make('fran5598'),
+            'is_admin' => false,
+        ]);
+
 
         // 2. Creamos 3 pistas de pádel
-        Court::create(['name' => 'Pista 1 - Cristal Central', 'is_active' => true]);
-        Court::create(['name' => 'Pista 2 - Cristal Lateral', 'is_active' => true]);
-        Court::create(['name' => 'Pista 3 - Muro', 'is_active' => true]);
+        Court::create(['name' => 'Pista 1 - Polideportivo', 'is_active' => true]);
+        Court::create(['name' => 'Pista 2 - Piscina', 'is_active' => true]);
     }
 }
