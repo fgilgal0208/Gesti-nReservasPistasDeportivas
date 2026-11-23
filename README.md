@@ -1,59 +1,69 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Cerro Muriano Pádel – Gestión de Reservas de Pistas 🎾
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicación web full-stack desarrollada en Laravel y Livewire para reservar las pistas deportivas municipales de Cerro Muriano. Los vecinos reservan y gestionan sus pistas online, y el Ayuntamiento cuenta con un panel exclusivo para controlar todas las reservas y exportarlas.
 
-## About Laravel
+## 🚀 Características principales
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Zona de usuario
+- **Cuentas de usuario:** registro, inicio de sesión, verificación de email y perfil, con Laravel Breeze y Livewire Volt.
+- **Calendario de reservas en tiempo real:** componente Livewire con vista semanal por pista y navegación entre semanas, sin recargar la página.
+- **Franjas horarias inteligentes:** reservas de 90 minutos entre las 9:00 y las 22:00, en franjas de 30 minutos. Solo se muestran los huecos libres y se descartan las horas ya pasadas.
+- **Control de solapamientos:** el sistema impide reservar una pista en un horario ya ocupado.
+- **Código de pago único:** cada reserva genera un código (por ejemplo, `MUR-3F9A1C`) y queda registrada como pendiente de pago.
+- **Envío del justificante de pago:** el usuario sube una foto del justificante (máx. 10 MB) y se envía por correo al Ayuntamiento como archivo adjunto.
+- **Mis próximas reservas:** consulta de las reservas futuras y opción de anularlas.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Panel del Ayuntamiento
+- **Acceso restringido:** middleware propio (`AdminMiddleware`) que solo permite la entrada a usuarios administradores.
+- **Listado de reservas** con todos los datos de cada una.
+- **Exportación a PDF y Excel** del listado de reservas, con DomPDF y Laravel Excel.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Stack tecnológico
 
-## Learning Laravel
+- **Backend:** PHP 8.2, Laravel 12
+- **Frontend:** Livewire 3, Livewire Volt, Blade, Tailwind CSS, Vite
+- **Autenticación:** Laravel Breeze
+- **Base de datos:** MySQL (usuarios, pistas y reservas)
+- **Exportación:** barryvdh/laravel-dompdf (PDF), maatwebsite/excel (Excel)
+- **Correo:** Laravel Mail con archivos adjuntos
+- **Control de versiones:** Git, GitHub
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## ⚙️ Instalación en local
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Necesitas tener instalados PHP 8.2+, Composer y Node.js.
 
-## Laravel Sponsors
+1. Clonar el repositorio:
+   ```bash
+   git clone https://github.com/fgilgal0208/Gesti-nReservasPistasDeportivas.git
+   cd Gesti-nReservasPistasDeportivas
+   ```
+2. Instalar las dependencias de PHP:
+   ```bash
+   composer install
+   ```
+3. Instalar y compilar las dependencias de frontend:
+   ```bash
+   npm install
+   npm run build
+   ```
+4. Configurar las variables de entorno y generar la clave de la aplicación:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+5. En el archivo `.env`, definir la conexión a la base de datos y los datos del servidor de correo (`MAIL_*`) para el envío de justificantes. Después, crear las tablas con las pistas y los usuarios de prueba:
+   ```bash
+   php artisan migrate --seed
+   ```
+6. Levantar el servidor de desarrollo:
+   ```bash
+   php artisan serve
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+La aplicación estará disponible en http://localhost:8000. Para acceder al panel del Ayuntamiento, el usuario debe tener el campo `is_admin` activado en la base de datos.
 
-### Premium Partners
+## 📄 Licencia y copyright
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+© 2026 Francisco Gilarte Galán. Todos los derechos reservados.
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Este repositorio y su contenido se proporcionan exclusivamente con fines de exhibición y evaluación profesional (portafolio). No se otorga permiso para utilizar, copiar, modificar o distribuir este código con fines comerciales o derivados sin autorización expresa del autor.
