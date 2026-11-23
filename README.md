@@ -2,6 +2,8 @@
 
 Aplicación web full-stack desarrollada en Laravel y Livewire para reservar las pistas deportivas municipales de Cerro Muriano. Los vecinos reservan y gestionan sus pistas online, y el Ayuntamiento cuenta con un panel exclusivo para controlar todas las reservas y exportarlas.
 
+> ℹ️ **Nota:** proyecto realizado con fines de aprendizaje durante mis estudios de Desarrollo de Aplicaciones Web (DAW). Puede contener errores o aspectos mejorables; cualquier sugerencia es bienvenida.
+
 ## 🚀 Características principales
 
 ### Zona de usuario
